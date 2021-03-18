@@ -3,8 +3,20 @@
 from algosdk.v2client import algod
 from algosdk import mnemonic
 from algosdk import transaction
+from algosdk import mnemonic
 
-#Connect to Algorand node maintained by PureStake
+
+#1) Generate an account
+#2) Fund the account from the Algorand Testnet Dispenser
+#3) Write a python script to send coins to a specified address
+
+
+mnemonic_secret = "SECRET"
+sk = mnemonic.to_private_key(mnemonic_secret)
+pk = mnemonic.to_public_key(mnemonic_secret)
+
+
+
 #Connect to Algorand node maintained by PureStake
 algod_address = "https://testnet-algorand.api.purestake.io/ps2"
 algod_token = "B3SU4KcVKi94Jap2VXkK83xx38bsv95K5UZm2lab"
@@ -16,6 +28,11 @@ headers = {
 acl = algod.AlgodClient(algod_token, algod_address, headers)
 min_balance = 100000 #https://developer.algorand.org/docs/features/accounts/#minimum-balance
 
+
+
+
+#Your function should take two inputs, a string “receiver_pk” and a number "amount". Your function should create a transaction
+#that sends “amount” microalgos to the account given by “receiver_pk” and submit the transaction to the Algorand Testnet.
 def send_tokens( receiver_pk, tx_amount ):
     params = acl.suggested_params()
     gen_hash = params.gh
@@ -24,6 +41,20 @@ def send_tokens( receiver_pk, tx_amount ):
     last_valid_round = params.last
 
     #Your code here
+    #Your function should return the address of the sender (“sender_pk”) as well as the id of the 
+    #resulting transaction (“txid”) as it appears on the Testnet blockchain.
+    
+    #create transaction
+    txid = transaction.PaymentTxn(pk, tx_fee, first_valid_round, last_valid_round, gen_hash, receiver_pk, tx_amount)
+    
+    #sign transaction with secret key
+    signed_tx = tx.sign(sk)
+
+    #send the signed transaction to the blockchain
+    tx_confirm = acl.send_transaction(signed_tx, headers)
+
+    info = acl.account_info(sk)
+    sender_pk = info["address"]
 
     return sender_pk, txid
 
