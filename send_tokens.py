@@ -30,11 +30,11 @@ min_balance = 100000 #https://developer.algorand.org/docs/features/accounts/#min
 
 
 
-
 #Your function should take two inputs, a string “receiver_pk” and a number "amount". Your function should create a transaction
 #that sends “amount” microalgos to the account given by “receiver_pk” and submit the transaction to the Algorand Testnet.
 def send_tokens( receiver_pk, tx_amount ):
     params = acl.suggested_params()
+    #gen = params.gen
     gen_hash = params.gh
     first_valid_round = params.first
     tx_fee = params.min_fee
@@ -45,16 +45,17 @@ def send_tokens( receiver_pk, tx_amount ):
     #resulting transaction (“txid”) as it appears on the Testnet blockchain.
     
     #create transaction
-    txid = transaction.PaymentTxn(pk, tx_fee, first_valid_round, last_valid_round, gen_hash, receiver_pk, tx_amount)
-    
+    tx = transaction.PaymentTxn(pk, tx_fee, first_valid_round, last_valid_round, gen_hash, receiver_pk, tx_amount, flat_fee=True)
     #sign transaction with secret key
     signed_tx = tx.sign(sk)
 
     #send the signed transaction to the blockchain
-    tx_confirm = acl.send_transaction(signed_tx, headers)
-
-    info = acl.account_info(sk)
-    sender_pk = info["address"]
+    try:
+    tx_confirm = acl.send_transaction(signed_tx)
+    print('Transaction sent with ID', signed_tx.transaction.get_txid())
+    wait_for_confirmation(algodclient, txid=signed_tx.transaction.get_txid())
+    except Exception as e:
+        print(e)
 
     return sender_pk, txid
 
