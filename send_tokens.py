@@ -21,7 +21,7 @@ sk = mnemonic.to_private_key(mnemonic_secret)
 pk = mnemonic.to_public_key(mnemonic_secret)
 acl = algod.AlgodClient(algod_token, algod_address, headers)
 min_balance = 100000 #https://developer.algorand.org/docs/features/accounts/#minimum-balance
-
+print(pk)
 
 #Your function should take two inputs, a string “receiver_pk” and a number "amount". Your function should create a transaction
 #that sends “amount” microalgos to the account given by “receiver_pk” and submit the transaction to the Algorand Testnet.
