@@ -10,54 +10,51 @@ from algosdk import mnemonic
 #2) Fund the account from the Algorand Testnet Dispenser
 #3) Write a python script to send coins to a specified address
 
+#Connect to Algorand node maintained by PureStake
+algod_token = "B3SU4KcVKi94Jap2VXkK83xx38bsv95K5UZm2lab"
+algod_address = "https://testnet-algorand.api.purestake.io/ps2"
+#algod_token = 'IwMysN3FSZ8zGVaQnoUIJ9RXolbQ5nRY62JRqF2H'
+headers = {"X-API-Key": algod_token}
 
 mnemonic_secret = "SECRET"
 sk = mnemonic.to_private_key(mnemonic_secret)
 pk = mnemonic.to_public_key(mnemonic_secret)
-
-
-
-#Connect to Algorand node maintained by PureStake
-algod_address = "https://testnet-algorand.api.purestake.io/ps2"
-algod_token = "B3SU4KcVKi94Jap2VXkK83xx38bsv95K5UZm2lab"
-#algod_token = 'IwMysN3FSZ8zGVaQnoUIJ9RXolbQ5nRY62JRqF2H'
-headers = {
-   "X-API-Key": algod_token,
-}
-
 acl = algod.AlgodClient(algod_token, algod_address, headers)
 min_balance = 100000 #https://developer.algorand.org/docs/features/accounts/#minimum-balance
-
 
 
 #Your function should take two inputs, a string “receiver_pk” and a number "amount". Your function should create a transaction
 #that sends “amount” microalgos to the account given by “receiver_pk” and submit the transaction to the Algorand Testnet.
 def send_tokens( receiver_pk, tx_amount ):
     params = acl.suggested_params()
-    #gen = params.gen
     gen_hash = params.gh
     first_valid_round = params.first
     tx_fee = params.min_fee
     last_valid_round = params.last
-
+    
     #Your code here
     #Your function should return the address of the sender (“sender_pk”) as well as the id of the 
     #resulting transaction (“txid”) as it appears on the Testnet blockchain.
-    
-    #create transaction
-    tx = transaction.PaymentTxn(pk, tx_fee, first_valid_round, last_valid_round, gen_hash, receiver_pk, tx_amount, flat_fee=True)
-    #sign transaction with secret key
+    send_amount = tx_amount
+    existing_account = pk
+    send_to_address = receiver_pk
+
+    #create and sign transaction
+    tx = transaction.PaymentTxn(existing_account, tx_fee, first_valid_round, last_valid_round, gen_hash, send_to_address, send_amount, flat_fee=True)
     signed_tx = tx.sign(sk)
 
     #send the signed transaction to the blockchain
     try:
-    tx_confirm = acl.send_transaction(signed_tx)
-    print('Transaction sent with ID', signed_tx.transaction.get_txid())
-    wait_for_confirmation(algodclient, txid=signed_tx.transaction.get_txid())
+        tx_confirm = acl.send_transaction(signed_tx)
+        wait_for_confirmation(acl, txid=signed_tx.transaction.get_txid())
     except Exception as e:
         print(e)
 
+    txid = tx
+    sender_pk = send_to_address
+
     return sender_pk, txid
+
 
 # Function from Algorand Inc.
 def wait_for_confirmation(client, txid):
