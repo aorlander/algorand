@@ -62,8 +62,10 @@ def send_tokens( receiver_pk, tx_amount ):
     except Exception as e:
         print(e)
 
-    txid = tx
+    txid = tx_confirm
     sender_pk = send_to_address
+
+
     print(txid, sender_pk)
 
     return sender_pk, txid
