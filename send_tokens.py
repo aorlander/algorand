@@ -4,6 +4,7 @@ from algosdk.v2client import algod
 from algosdk import mnemonic
 from algosdk import transaction
 from algosdk import mnemonic
+import base64
 
 
 #1) Generate an account
@@ -11,17 +12,28 @@ from algosdk import mnemonic
 #3) Write a python script to send coins to a specified address
 
 #Connect to Algorand node maintained by PureStake
-algod_token = "B3SU4KcVKi94Jap2VXkK83xx38bsv95K5UZm2lab"
+
+
+
+algod_token = "B3SU4KcVKi94Jap2VXkK83xx38bsv95K5UZm2lab" #API key
 algod_address = "https://testnet-algorand.api.purestake.io/ps2"
 #algod_token = 'IwMysN3FSZ8zGVaQnoUIJ9RXolbQ5nRY62JRqF2H'
 headers = {"X-API-Key": algod_token}
 
-mnemonic_secret = "SECRET"
+
+
+mnemonic_secret = "polar taxi broccoli decrease ten decrease illness engine suit useless unit planet eternal abandon click during adapt decide jazz proud evil kingdom century abstract empty"
 sk = mnemonic.to_private_key(mnemonic_secret)
 pk = mnemonic.to_public_key(mnemonic_secret)
 acl = algod.AlgodClient(algod_token, algod_address, headers)
 min_balance = 100000 #https://developer.algorand.org/docs/features/accounts/#minimum-balance
-print(pk)
+
+#print(algod_address)
+#print(algod_token)
+#print(headers)
+#print("Base64 Private Key: {}\nPublic Algorand Address: {}\n".format(sk, pk))
+#Base64 Private Key: cvc2Zgq8GVTtCAR9PAC8O6rLn7s39QdOKU3ldvLK6zffxHg1oanbrGbU3kL6w0NeB4KO2ChJHaaDf25Zb1OqZw==
+#Public Algorand Address: 37CHQNNBVHN2YZWU3ZBPVQ2DLYDYFDWYFBER3JUDP5XFS32TVJT3ZEXNE4
 
 #Your function should take two inputs, a string “receiver_pk” and a number "amount". Your function should create a transaction
 #that sends “amount” microalgos to the account given by “receiver_pk” and submit the transaction to the Algorand Testnet.
@@ -52,6 +64,7 @@ def send_tokens( receiver_pk, tx_amount ):
 
     txid = tx
     sender_pk = send_to_address
+    print(txid, sender_pk)
 
     return sender_pk, txid
 
@@ -72,3 +85,6 @@ def wait_for_confirmation(client, txid):
     print("Transaction {} confirmed in round {}.".format(txid, txinfo.get('confirmed-round')))
     return txinfo
 
+
+
+send_tokens('AEC4WDHXCDF4B5LBNXXRTB3IJTVJSWUZ4VJ4THPU2QGRJGTA3MIDFN3CQA', 3000)
